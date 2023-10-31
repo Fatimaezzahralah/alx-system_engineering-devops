@@ -1,13 +1,68 @@
 #!/usr/bin/env bash
-# A script to configure Nginx server so that /redirect_me is redirecting to another page.
+# Automate - installation and configuration of an Ubuntu macine to for nginx server
+# It has a custome error page
+# Ensure to use 'sudo' previleges if you are not a super user
 
-sudo apt-get update
-sudo apt-get -y install nginx
-sudo ufw allow 'Nginx HTTP'
-sudo service nginx start
-echo "Hello World!" > /var/www/html/index.nginx-debian.html
-sed -i '/listen 80 default_server;/a rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
-echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
-sed -i '/server_name _;/a error_page 404 /custom_404.html;\nlocation = /custom_404.html {\nroot /usr/share/nginx/html;\ninternal;\n}' /etc/nginx/sites-available/default
-sudo service nginx restart
-sudo service nginx reload
+SITE='/var/www/html'
+default_index="$SITE/index.html"
+server_config='/etc/nginx/sites-enabled/default'
+# server_config_temp='./server_config_4'
+error_page="$SITE/404.html"
+
+# Install nginx server
+apt-get -y install nginx
+
+# Set ufw status - Adjust the Firewal
+ufw allow 'Nginx HTTP'
+
+# Configure user to own site
+mkdir --parents "$SITE"
+chown -R "$USER":"$USER" "$SITE"
+
+# Create landing page
+echo "Hello World!" > "$default_index"
+
+# Create error page
+echo "Ceci n'est pas une page
+" > "$error_page"
+
+# Configure server
+# cp "$server_config_temp" "$server_config"
+
+# shellcheck disable=SC2016
+echo '# Configuration for server - ONWUTA EBUBE GIDEON
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	root /var/www/html;
+
+	# Add index
+	index index.html
+
+	server_name _;
+
+	location / {
+		# First attempt to serve a request as file, then
+		# as directiory, then fall back to dispalying a 404 ERROR.
+		try_files $uri $uri/ =404;
+	}
+
+	location /redirect_me {
+		# Have fun with redirection
+		rewrite ^/redirect_me(.*)$ https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;
+	}
+
+	# Create a custom 404 error page
+	error_page 404 /404.html;
+	location = /404.html {
+		# to ensure it cannot be accessed directly by clients
+		internal;
+	}
+}' > "$server_config"
+
+# CONFIGURATION
+# new_string="server_name _;\n\n\t
+
+# Restart service
+service nginx restart
