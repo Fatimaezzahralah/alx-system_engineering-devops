@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
-# Install Firewall; block all incoming traffic but allow ssh, https ssl and http
-sudo apt-get --assume-yes update
-sudo apt-get --assume-yes install ufw
+# Install ufw
+sudo apt-get update
+sudo apt-get install ufw
+
+# Configure ufw to block all incoming traffic
 sudo ufw default deny incoming
+
+# Allow incoming traffic on specific TCP ports
 sudo ufw allow 22/tcp
-sudo ufw allow 443/tcp
 sudo ufw allow 80/tcp
-sudo ufw --force enable
+sudo ufw allow 443/tcp
+
+# Enable ufw
+sudo ufw enable
+
+# Display ufw status for verification
+sudo ufw status
