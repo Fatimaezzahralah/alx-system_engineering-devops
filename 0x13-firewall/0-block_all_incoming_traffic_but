@@ -2,7 +2,7 @@
 
 # Install ufw
 sudo apt-get update
-sudo apt install ufw
+sudo apt-get install ufw
 
 # Configure ufw to block all incoming traffic
 sudo ufw default deny incoming
@@ -16,4 +16,4 @@ sudo ufw allow 443/tcp
 sudo ufw enable
 
 # Display ufw status for verification
-sudo ufw status
+sudo ufw status verbose
